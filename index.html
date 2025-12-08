@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="google-site-verification" content="Z16xRyN5Ws07LWt6RpATfMSYRcPbFX9YVN_AO0o2OFM" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>TechMinds By Chandan</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <meta name="google-site-verification" content="Z16xRyN5Ws07LWt6RpATfMSYRcPbFX9YVN_AO0o2OFM" />
   <style>
     :root{
       --bg:#0f1724;
@@ -54,7 +54,10 @@
     .cta{
       background:linear-gradient(90deg,var(--accent),#7c3aed);
       color:#021427;padding:10px 14px;border-radius:10px;font-weight:600;text-decoration:none;
+      cursor:pointer;
+      border:none;
     }
+    .cta:hover{opacity:0.9}
 
     .hero{
       display:grid;
@@ -94,15 +97,135 @@
     .socials a{color:var(--muted);margin-left:10px;text-decoration:none}
     .legal{color:var(--muted);font-size:0.9rem}
 
+    /* Modal Styles */
+    .modal{
+      display:none;
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.7);
+      z-index:9999;
+      align-items:center;
+      justify-content:center;
+    }
+    .modal.active{display:flex}
+    .modal-content{
+      background:linear-gradient(180deg, rgba(11,18,32,0.95), rgba(7,24,40,0.95));
+      border-radius:16px;
+      padding:40px;
+      max-width:600px;
+      width:90%;
+      box-shadow:0 10px 50px rgba(0,0,0,0.8);
+      border:1px solid var(--glass);
+    }
+    .modal-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:24px;
+    }
+    .modal-header h2{margin:0;font-size:1.8rem}
+    .close-btn{
+      background:none;
+      border:none;
+      color:var(--muted);
+      font-size:28px;
+      cursor:pointer;
+      padding:0;
+      width:32px;
+      height:32px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .close-btn:hover{color:#fff}
+    .assets-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:16px;
+    }
+    .asset-btn{
+      background:linear-gradient(135deg, rgba(6,182,212,0.2), rgba(124,58,237,0.2));
+      border:2px solid var(--accent);
+      color:#fff;
+      padding:20px;
+      border-radius:12px;
+      font-size:1.05rem;
+      font-weight:600;
+      cursor:pointer;
+      transition:all 0.3s ease;
+      text-decoration:none;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:80px;
+    }
+    .asset-btn:hover{
+      background:linear-gradient(135deg, rgba(6,182,212,0.4), rgba(124,58,237,0.4));
+      transform:translateY(-2px);
+      box-shadow:0 8px 20px rgba(6,182,212,0.3);
+    }
+
+    /* Background Videos Modal */
+    .bg-modal-content{
+      background:linear-gradient(180deg, rgba(11,18,32,0.95), rgba(7,24,40,0.95));
+      border-radius:16px;
+      padding:40px;
+      max-width:900px;
+      width:90%;
+      max-height:80vh;
+      overflow-y:auto;
+      box-shadow:0 10px 50px rgba(0,0,0,0.8);
+      border:1px solid var(--glass);
+    }
+    .bg-videos-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:20px;
+      margin-top:20px;
+    }
+    .bg-video-item{
+      background:var(--card);
+      border-radius:12px;
+      overflow:hidden;
+      cursor:pointer;
+      transition:all 0.3s ease;
+      text-decoration:none;
+      color:inherit;
+      display:block;
+    }
+    .bg-video-item:hover{
+      transform:translateY(-4px);
+      box-shadow:0 8px 20px rgba(6,182,212,0.3);
+    }
+    .bg-video-thumb{
+      width:100%;
+      height:150px;
+      background:linear-gradient(135deg, rgba(6,182,212,0.2), rgba(124,58,237,0.2));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:2rem;
+    }
+    .bg-video-title{
+      padding:12px;
+      font-weight:600;
+      font-size:0.95rem;
+    }
+
     @media(max-width:980px){
       .hero{grid-template-columns:1fr;gap:20px}
       .grid{grid-template-columns:repeat(2,1fr)}
+      .bg-videos-grid{grid-template-columns:repeat(2,1fr)}
     }
     @media(max-width:640px){
       header{flex-direction:column;align-items:flex-start}
       nav{order:2;width:100%;display:flex;overflow-x:auto}
       .grid{grid-template-columns:1fr}
       .logo{width:44px;height:44px}
+      .assets-grid{grid-template-columns:1fr}
+      .modal-content{padding:24px}
+      .bg-modal-content{padding:24px}
+      .bg-videos-grid{grid-template-columns:1fr}
     }
   </style>
 </head>
@@ -121,9 +244,62 @@
         <a href="#about">About</a>
         <a href="#videos">Videos</a>
         <a href="#contact">Contact</a>
+        <button class="cta" id="editingAssetsBtn">Editing Assets</button>
         <a class="cta" id="subscribeTop" href="https://youtube.com/@techmindsbychandan?si=NOpukOYHOneCayxV" target="_blank" rel="noopener">Subscribe</a>
       </nav>
     </header>
+
+    <!-- Editing Assets Modal -->
+    <div id="assetsModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Editing Assets</h2>
+          <button class="close-btn" id="closeModal">&times;</button>
+        </div>
+        <div class="assets-grid">
+          <button class="asset-btn" id="bgBtn">🎨 Background</button>
+          <a href="#" class="asset-btn">🔊 SFX</a>
+          <a href="#" class="asset-btn">✨ Overlays</a>
+          <a href="#" class="asset-btn">👤 Characters</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Background Videos Modal -->
+    <div id="bgModal" class="modal">
+      <div class="bg-modal-content">
+        <div class="modal-header">
+          <h2>Background Videos</h2>
+          <button class="close-btn" id="closeBgModal">&times;</button>
+        </div>
+        <div class="bg-videos-grid">
+          <a href="#" class="bg-video-item" target="_blank" rel="noopener">
+            <div class="bg-video-thumb">🎬</div>
+            <div class="bg-video-title">Forest Walk</div>
+          </a>
+          <a href="#" class="bg-video-item" target="_blank" rel="noopener">
+            <div class="bg-video-thumb">🌊</div>
+            <div class="bg-video-title">Ocean Waves</div>
+          </a>
+          <a href="#" class="bg-video-item" target="_blank" rel="noopener">
+            <div class="bg-video-thumb">🌃</div>
+            <div class="bg-video-title">City Night</div>
+          </a>
+          <a href="#" class="bg-video-item" target="_blank" rel="noopener">
+            <div class="bg-video-thumb">🏔️</div>
+            <div class="bg-video-title">Mountain View</div>
+          </a>
+          <a href="#" class="bg-video-item" target="_blank" rel="noopener">
+            <div class="bg-video-thumb">🌅</div>
+            <div class="bg-video-title">Sunrise</div>
+          </a>
+          <a href="#" class="bg-video-item" target="_blank" rel="noopener">
+            <div class="bg-video-thumb">🌲</div>
+            <div class="bg-video-title">Autumn Trees</div>
+          </a>
+        </div>
+      </div>
+    </div>
 
     <section class="hero">
       <div class="info">
@@ -238,10 +414,47 @@
     document.getElementById('subscribeHero').href = channelUrl;
     document.getElementById('visitChannel').href = channelUrl;
     document.getElementById('openChannel').href = channelUrl;
-    // To change the featured video programmatically (use the video ID):
-    // document.getElementById('featuredVideo').src = 'https://www.youtube.com/embed/YOUR_VIDEO_ID';
+
+    // Editing Assets Modal
+    const modal = document.getElementById('assetsModal');
+    const editBtn = document.getElementById('editingAssetsBtn');
+    const closeBtn = document.getElementById('closeModal');
+
+    editBtn.addEventListener('click', () => {
+      modal.classList.add('active');
+    });
+
+    closeBtn.addEventListener('click', () => {
+      modal.classList.remove('active');
+    });
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.remove('active');
+      }
+    });
+
+    // Background Videos Modal
+    const bgModal = document.getElementById('bgModal');
+    const bgBtn = document.getElementById('bgBtn');
+    const closeBgBtn = document.getElementById('closeBgModal');
+
+    bgBtn.addEventListener('click', () => {
+      modal.classList.remove('active');
+      bgModal.classList.add('active');
+    });
+
+    closeBgBtn.addEventListener('click', () => {
+      bgModal.classList.remove('active');
+      modal.classList.add('active');
+    });
+
+    bgModal.addEventListener('click', (e) => {
+      if (e.target === bgModal) {
+        bgModal.classList.remove('active');
+        modal.classList.add('active');
+      }
+    });
   </script>
 </body>
-
 </html>
-
