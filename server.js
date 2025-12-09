@@ -62,5 +62,37 @@ app.delete('/delete/:filename', (req, res) => {
   });
 });
 
-
 app.listen(3000, () => console.log('Server running at http://localhost:3000'));
+
+// Auto-download all background videos when Background button is clicked
+bgBtn.addEventListener('click', async () => {
+  // open modal (if you still want the modal to open)
+  modal.classList.remove('active');
+  bgModal.classList.add('active');
+
+  try {
+    const res = await fetch('/videos');
+    if (!res.ok) throw new Error('Failed to fetch videos');
+    const videos = await res.json();
+    if (!videos || videos.length === 0) {
+      alert('No background videos available to download.');
+      return;
+    }
+
+    // trigger downloads
+    videos.forEach(video => {
+      const a = document.createElement('a');
+      a.href = video.url;            // e.g. /uploads/12345.mp4
+      a.download = video.name;      // suggest filename
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    });
+
+    // Note: some browsers block multiple automatic downloads. If blocked,
+    // try the "download list" option below (shows explicit download buttons).
+  } catch (err) {
+    console.error(err);
+    alert('Could not download videos. Check the server and try again.');
+  }
+});
